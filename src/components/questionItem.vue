@@ -1,7 +1,7 @@
 <template>
-  <div :class="{active:questionItem.completed}" class="question">
+<!--  <div :class="{active:questionItem.completed}" class="questionItem">
     <div class="actions">
-      <h3  @click="changeDetail()">{{questionItem.title}}</h3>
+      <h3  @click="changeDetail()">{{questionItem.question}}</h3>
       <div class="icons">
     <router-link :to="{name:'EditProject', params:{id:questionItem.id}}">
       <span class="material-symbols-outlined">edit</span>
@@ -10,33 +10,84 @@
         <span :class="{active:questionItem.completed}" @click="toggleComplete" class="material-symbols-outlined">done</span>
       </div>
     </div>
-    <div v-if="showDetails" class="details">
-      <p>{{questionItem.details}}</p>
+    <div v-for="answerItem in questionItem.answers" v-if="showDetails" class="details">
+      <p>{{answerItem.answer}}</p>
+      <p>{{answerItem.isTrue}}</p>
     </div>
+  </div>-->
+    <div  class="questionItem">
+    <div class="actions">
+      <h3 v-if="questionItem.question" @click="nameClick()">{{questionItem.question}}</h3>
+      <h3 v-if="questionItem.name" @click="nameClick()">{{questionItem.name}}</h3>
+      <div class="icons">
+
+      <span v-if="questionItem.question" class="material-symbols-outlined" @click="editProject()">edit</span>
+
+        <span  v-if="questionItem.name" @click="questionAdd()" class="material-symbols-outlined">add</span>
+<!--        <span :class="{active:questionItem.completed}" @click="toggleComplete" class="material-symbols-outlined">done</span>-->
+      </div>
+    </div>
+      <div v-if="questionItem.answers">
+        <div v-for="answerItem in questionItem.answers" v-if="showDetails" class="details">
+          <p>{{answerItem.answer}}</p>
+          <p>{{answerItem.isTrue}}</p>
+        </div>
+      </div>
+      <div v-if="questionItem.questions">
+        <div v-if="showDetails" class="details">
+       <div>
+
+       </div>
+        </div>
+      </div>
+
   </div>
 </template>
 
 <script>
+import HomeView from '../views/HomeView'
 export default {
   name: 'HelloWorld',
+  components: {HomeView},
+
   props:['questionItem'],
   data(){
     return{
       showDetails: false,
-      uri: 'http://localhost:3000/questions/' + this.question.id,
+      uri: 'http://localhost:3000/questions/' + this.questionItem.id,
     }
   },
   methods:{
-    changeDetail(){
+    nameClick(){
       this.showDetails = !this.showDetails
-    },
-    deleteProject(){
-      fetch(this.uri, {method: "DELETE",}).then(()=>
-          this.$emit('delete', this.questionItem.id)
-      ).catch(err =>console.log(err))
+      console.log('this.questionItem',this.questionItem.id)
+      if(this.questionItem.name){
+        this.$router.push("/" + this.questionItem.id)
+      }
 
     },
-    toggleComplete(){
+    questionAdd(){
+   /*   fetch(this.uri, {method: "DELETE",}).then(()=>
+          this.$emit('delete', this.questionItem.id)
+      ).catch(err =>console.log(err))*/
+      this.$router.push("/AddProject/" + this.questionItem.id)
+
+
+
+
+    },
+    editProject() {
+      console.log('quesrtion id ',this.questionItem)
+/*      return*/
+      this.$router.push({
+        name: 'EditProject',
+        query: {
+          examId: this.$route.params.id,
+          id: this.questionItem.id
+        }
+      })
+    },
+   /* toggleComplete(){
       fetch(this.uri, {
         method: "PATCH",
         headers: {'Content-Type': 'application/json'},
@@ -44,8 +95,14 @@ export default {
       }).then(()=>
           this.$emit('completed', this.questionItem.id)
       ).catch(err =>console.log(err))
-    }
-  }
+    }*/
+  },
+ /* mounted() {
+    fetch('http://localhost:3000/questions')
+        .then(res => res.json())
+        .then(data=> this.questions = data)
+        .catch(err => console.error(err.message))
+  },*/
 
 }
 </script>
